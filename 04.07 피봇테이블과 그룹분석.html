@@ -1,0 +1,3279 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4.7 피봇테이블과 그룹분석 – 데이터 사이언스 스쿨 - 파이썬</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-49c8c4e9abc5c85f6ef827bc95f3ef76.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      데이터 사이언스 스쿨 - 파이썬
+      </li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">데이터 사이언스 스쿨 - 파이썬</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00.00 소개의 글.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">소개의 글</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./01.00 1장 파이썬 설치와 설정.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1장 파이썬 설치와 설정</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01.01 파이썬 설치하기.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.1 파이썬 설치하기</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01.02 파이썬 처음 사용하기.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.2 파이썬 처음 사용하기</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01.03 파이썬 패키지 설치하기.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.3 파이썬 패키지 설치하기</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01.04 데이터 분석용 파이썬 패키지 소개.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.4 데이터 분석용 파이썬 패키지 소개</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01.05 아이파이썬 및 주피터 설정.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1.5 아이파이썬 및 주피터 설정</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#피봇테이블" id="toc-피봇테이블" class="nav-link active" data-scroll-target="#피봇테이블">피봇테이블</a></li>
+  <li><a href="#그룹분석" id="toc-그룹분석" class="nav-link" data-scroll-target="#그룹분석">그룹분석</a>
+  <ul class="collapse">
+  <li><a href="#groupby-메서드" id="toc-groupby-메서드" class="nav-link" data-scroll-target="#groupby-메서드"><code>groupby</code> 메서드</a></li>
+  <li><a href="#그룹연산-메서드" id="toc-그룹연산-메서드" class="nav-link" data-scroll-target="#그룹연산-메서드">그룹연산 메서드</a></li>
+  </ul></li>
+  <li><a href="#pivot_table" id="toc-pivot_table" class="nav-link" data-scroll-target="#pivot_table"><code>pivot_table</code></a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">4.7 피봇테이블과 그룹분석</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="피봇테이블" class="level2">
+<h2 class="anchored" data-anchor-id="피봇테이블">피봇테이블</h2>
+<pre class="{margin}"><code>`pivot`</code></pre>
+<p>피봇테이블(pivot table)이란 데이터 열 중에서 두 개의 열을 각각 행 인덱스, 열 인덱스로 사용하여 데이터를 조회하여 펼쳐놓은 것을 말한다.</p>
+<p>판다스는 피봇테이블을 만들기 위한 <code>pivot</code> 메서드를 제공한다. 첫번째 인수로는 행 인덱스로 사용할 열 이름, 두번째 인수로는 열 인덱스로 사용할 열 이름, 그리고 마지막으로 데이터로 사용할 열 이름을 넣는다.</p>
+<p>판다스는 지정된 두 열을 각각 행 인덱스와 열 인덱스로 바꾼 후 행 인덱스의 라벨 값이 첫번째 키의 값과 같고 열 인덱스의 라벨 값이 두번째 키의 값과 같은 데이터를 찾아서 해당 칸에 넣는다. 만약 주어진 데이터가 존재하지 않으면 해당 칸에 <code>NaN</code> 값을 넣는다.</p>
+<p>다음 데이터는 각 도시의 연도별 인구를 나타낸 것이다.</p>
+<div id="cell-6" class="cell" data-school_cell_uuid="9015023ce50a4bac87830f7fa6f947a3" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"도시"</span>: [<span class="st">"서울"</span>, <span class="st">"서울"</span>, <span class="st">"서울"</span>, <span class="st">"부산"</span>, <span class="st">"부산"</span>, <span class="st">"부산"</span>, <span class="st">"인천"</span>, <span class="st">"인천"</span>],</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"연도"</span>: [<span class="st">"2015"</span>, <span class="st">"2010"</span>, <span class="st">"2005"</span>, <span class="st">"2015"</span>, <span class="st">"2010"</span>, <span class="st">"2005"</span>, <span class="st">"2015"</span>, <span class="st">"2010"</span>],</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"인구"</span>: [<span class="dv">9904312</span>, <span class="dv">9631482</span>, <span class="dv">9762546</span>, <span class="dv">3448737</span>, <span class="dv">3393191</span>, <span class="dv">3512547</span>, <span class="dv">2890451</span>, <span class="dv">263203</span>],</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"지역"</span>: [<span class="st">"수도권"</span>, <span class="st">"수도권"</span>, <span class="st">"수도권"</span>, <span class="st">"경상권"</span>, <span class="st">"경상권"</span>, <span class="st">"경상권"</span>, <span class="st">"수도권"</span>, <span class="st">"수도권"</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>columns <span class="op">=</span> [<span class="st">"도시"</span>, <span class="st">"연도"</span>, <span class="st">"인구"</span>, <span class="st">"지역"</span>]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>df1 <span class="op">=</span> pd.DataFrame(data, columns<span class="op">=</span>columns)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>df1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">인구</th>
+<th data-quarto-table-cell-role="th">지역</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>서울</td>
+<td>2015</td>
+<td>9904312</td>
+<td>수도권</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>서울</td>
+<td>2010</td>
+<td>9631482</td>
+<td>수도권</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>서울</td>
+<td>2005</td>
+<td>9762546</td>
+<td>수도권</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>부산</td>
+<td>2015</td>
+<td>3448737</td>
+<td>경상권</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>부산</td>
+<td>2010</td>
+<td>3393191</td>
+<td>경상권</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>부산</td>
+<td>2005</td>
+<td>3512547</td>
+<td>경상권</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>인천</td>
+<td>2015</td>
+<td>2890451</td>
+<td>수도권</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>인천</td>
+<td>2010</td>
+<td>263203</td>
+<td>수도권</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>이 데이터를 도시 이름이 열 인덱스가 되고 연도가 행 인덱스가 되어 행과 열 인덱스만 보면 어떤 도시의 어떤 시점의 인구를 쉽게 알 수 있도록 피봇테이블로 만들어보자. <code>pivot</code> 명령으로 사용하고 행 인덱스 인수로는 <code>"도시"</code>, 열 인덱스 인수로는 <code>"연도"</code>, 데이터 이름으로 <code>"인구"</code>를 입력하면 된다.</p>
+<div id="cell-8" class="cell" data-school_cell_uuid="09f74f677def485baca9b1be439cfe04" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df1.pivot(<span class="st">"도시"</span>, <span class="st">"연도"</span>, <span class="st">"인구"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">2005</th>
+<th data-quarto-table-cell-role="th">2010</th>
+<th data-quarto-table-cell-role="th">2015</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3512547.0</td>
+<td>3393191.0</td>
+<td>3448737.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9762546.0</td>
+<td>9631482.0</td>
+<td>9904312.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>NaN</td>
+<td>263203.0</td>
+<td>2890451.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>이 피봇테이블의 값 3512547은 “도시”가 부산이고 “연도”가 2005년인 데이터를 “인구”열에서 찾은 값이다. 2005년 인천의 인구는 데이터에 없기 때문에 <code>NaN</code>으로 표시된다.</p>
+<p>피봇테이블은 다음과 같이 <code>set_index</code> 명령과 <code>unstack</code> 명령을 사용해서 만들 수도 있다.</p>
+<div id="cell-11" class="cell" data-school_cell_uuid="5d41fe936e5142d5989fcff35a59bc67" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df1.set_index([<span class="st">"도시"</span>, <span class="st">"연도"</span>])[[<span class="st">"인구"</span>]].unstack()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th colspan="3" data-quarto-table-cell-role="th" data-halign="left">인구</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">2005</th>
+<th data-quarto-table-cell-role="th">2010</th>
+<th data-quarto-table-cell-role="th">2015</th>
+</tr>
+<tr class="header">
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3512547.0</td>
+<td>3393191.0</td>
+<td>3448737.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9762546.0</td>
+<td>9631482.0</td>
+<td>9904312.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>NaN</td>
+<td>263203.0</td>
+<td>2890451.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>행 인덱스나 열 인덱스를 리스트로 주는 경우에는 다중 인덱스 피봇 테이블을 생성한다. (주의: 판다스 버전 1.1 미만에서는 버그로 인해 동작하지 않는다.)</p>
+<div id="cell-13" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df1.pivot([<span class="st">"지역"</span>, <span class="st">"도시"</span>], <span class="st">"연도"</span>, <span class="st">"인구"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">2005</th>
+<th data-quarto-table-cell-role="th">2010</th>
+<th data-quarto-table-cell-role="th">2015</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">지역</th>
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">경상권</td>
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3512547.0</td>
+<td>3393191.0</td>
+<td>3448737.0</td>
+</tr>
+<tr class="even">
+<td rowspan="2" data-quarto-table-cell-role="th" data-valign="top">수도권</td>
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9762546.0</td>
+<td>9631482.0</td>
+<td>9904312.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>NaN</td>
+<td>263203.0</td>
+<td>2890451.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>행 인덱스와 열 인덱스는 데이터를 찾는 키(key)의 역할을 한다. 따라서 키 값으로 데이터가 단 하나만 찾아져야 한다. 만약 행 인덱스와 열 인덱스 조건을 만족하는 데이터가 2개 이상인 경우에는 에러가 발생한다. 예를 들어 위 데이터프레임에서 (“지역”, “연도”)를 키로 하면 (“수도권”, “2015”)에 해당하는 값이 두 개 이상이므로 다음과 같이 에러가 발생한다.</p>
+<div id="cell-15" class="cell" data-school_cell_uuid="d1256836fa7c4095b43b026eacf66f22" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    df1.pivot(<span class="st">"지역"</span>, <span class="st">"연도"</span>, <span class="st">"인구"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> e:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"ValueError:"</span>, e)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ValueError: Index contains duplicate entries, cannot reshape</code></pre>
+</div>
+</div>
+</section>
+<section id="그룹분석" class="level2">
+<h2 class="anchored" data-anchor-id="그룹분석">그룹분석</h2>
+<p>만약 키가 지정하는 조건에 맞는 데이터가 하나 이상이라서 데이터 그룹을 이루는 경우에는 그룹의 특성을 보여주는 그룹분석(group analysis)을 해야 한다.</p>
+<p>그룹분석은 피봇테이블과 달리 키에 의해서 결정되는 데이터가 여러개가 있을 경우 미리 지정한 연산을 통해 그 그룹 데이터의 대표값을 계산한다. 판다스에서는 <code>groupby</code> 메서드를 사용하여 다음처럼 그룹분석을 한다.</p>
+<ol type="1">
+<li>분석하고자 하는 시리즈나 데이터프레임에 <code>groupby</code> 메서드를 호출하여 그룹화를 한다.</li>
+<li>그룹 객체에 대해 그룹연산을 수행한다.</li>
+</ol>
+<pre class="{margin}"><code>`groupby`</code></pre>
+<section id="groupby-메서드" class="level3">
+<h3 class="anchored" data-anchor-id="groupby-메서드"><code>groupby</code> 메서드</h3>
+<p><code>groupby</code> 메서드는 데이터를 그룹 별로 분류하는 역할을 한다. <code>groupby</code> 메서드의 인수로는 다음과 같은 값을 사용한다.</p>
+<ul>
+<li>열 또는 열의 리스트</li>
+<li>행 인덱스</li>
+</ul>
+<p>연산 결과로 그룹 데이터를 나타내는 <code>GroupBy</code> 클래스 객체를 반환한다. 이 객체에는 그룹별로 연산을 할 수 있는 그룹연산 메서드가 있다.</p>
+</section>
+<section id="그룹연산-메서드" class="level3">
+<h3 class="anchored" data-anchor-id="그룹연산-메서드">그룹연산 메서드</h3>
+<p><code>groupby</code> 결과, 즉 <code>GroupBy</code> 클래스 객체의 뒤에 붙일 수 있는 그룹연산 메서드는 다양하다. 다음은 자주 사용되는 그룹연산 메서드들이다.</p>
+<ul>
+<li><code>size</code>, <code>count</code>: 그룹 데이터의 갯수</li>
+<li><code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>: 그룹 데이터의 평균, 중앙값, 최소, 최대</li>
+<li><code>sum</code>, <code>prod</code>, <code>std</code>, <code>var</code>, <code>quantile</code> : 그룹 데이터의 합계, 곱, 표준편차, 분산, 사분위수</li>
+<li><code>first</code>, <code>last</code>: 그룹 데이터 중 가장 첫번째 데이터와 가장 나중 데이터</li>
+</ul>
+<p>이 외에도 많이 사용되는 것으로는 다음과 같은 그룹연산이 있다.</p>
+<ul>
+<li><code>agg</code>, <code>aggregate</code>
+<ul>
+<li>만약 원하는 그룹연산이 없는 경우 함수를 만들고 이 함수를 <code>agg</code>에 전달한다.</li>
+<li>또는 여러가지 그룹연산을 동시에 하고 싶은 경우 함수 이름 문자열의 리스트를 전달한다.</li>
+</ul></li>
+<li><code>describe</code>
+<ul>
+<li>하나의 그룹 대표값이 아니라 여러개의 값을 데이터프레임으로 구한다.</li>
+</ul></li>
+<li><code>apply</code>
+<ul>
+<li><code>describe</code> 처럼 하나의 대표값이 아닌 데이터프레임을 출력하지만 원하는 그룹연산이 없는 경우에 사용한다.</li>
+</ul></li>
+<li><code>transform</code>
+<ul>
+<li>그룹에 대한 대표값을 만드는 것이 아니라 그룹별 계산을 통해 데이터 자체를 변형한다.</li>
+</ul></li>
+</ul>
+<p>예를 들어 다음과 같은 데이터가 있을 때 key1의 값(A 또는 B)에 따른 data1의 평균은 어떻게 구할까?</p>
+<div id="cell-24" class="cell" data-school_cell_uuid="96d20974833c49a3aebcea54bbeb53ef" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'key1'</span>: [<span class="st">'A'</span>, <span class="st">'A'</span>, <span class="st">'B'</span>, <span class="st">'B'</span>, <span class="st">'A'</span>],</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'key2'</span>: [<span class="st">'one'</span>, <span class="st">'two'</span>, <span class="st">'one'</span>, <span class="st">'two'</span>, <span class="st">'one'</span>],</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'data1'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'data2'</span>: [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>df2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">key1</th>
+<th data-quarto-table-cell-role="th">key2</th>
+<th data-quarto-table-cell-role="th">data1</th>
+<th data-quarto-table-cell-role="th">data2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>A</td>
+<td>one</td>
+<td>1</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>A</td>
+<td>two</td>
+<td>2</td>
+<td>20</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>B</td>
+<td>one</td>
+<td>3</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>B</td>
+<td>two</td>
+<td>4</td>
+<td>40</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>A</td>
+<td>one</td>
+<td>5</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>groupby</code> 명령을 사용하여 그룹 A와 그룹 B로 구분한 그룹 데이터를 만든다.</p>
+<div id="cell-26" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>groups <span class="op">=</span> df2.groupby(df2.key1)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>groups</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>&lt;pandas.core.groupby.generic.DataFrameGroupBy object at 0x7fc4910a00d0&gt;</code></pre>
+</div>
+</div>
+<p>이 <code>GroupBy</code> 클래스 객체에는 각 그룹 데이터의 인덱스를 저장한 <code>groups</code> 속성이 있다.</p>
+<div id="cell-28" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>groups.groups</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>{'A': [0, 1, 4], 'B': [2, 3]}</code></pre>
+</div>
+</div>
+<p>A그룹과 B그룹 데이터의 합계를 구하기 위해 <code>sum</code>이라는 그룹연산을 한다.</p>
+<div id="cell-30" class="cell" data-school_cell_uuid="2808b883914b41019243ae192891f057" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>groups.<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">data1</th>
+<th data-quarto-table-cell-role="th">data2</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">key1</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">A</td>
+<td>8</td>
+<td>80</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">B</td>
+<td>7</td>
+<td>70</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>GroupBy</code> 클래스 객체를 명시적으로 얻을 필요가 없다면 <code>groupby</code> 메서드와 그룹연산 메서드를 연속으로 호출한다. 다음 예제는 열 <code>data1</code>에 대해서만 그룹연산을 하는 코드이다.</p>
+<div id="cell-32" class="cell" data-school_cell_uuid="2808b883914b41019243ae192891f057" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df2.data1.groupby(df2.key1).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>key1
+A    8
+B    7
+Name: data1, dtype: int64</code></pre>
+</div>
+</div>
+<p>데이터를 그룹으로 나눈 <code>GroupBy</code> 클래스 객체 또는 그룹분석한 결과에서 <code>data1</code>만 뽑아도 된다.</p>
+<div id="cell-34" class="cell" data-school_cell_uuid="cf539f8c5d5d45ef99c2bda7002efad4" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df2.groupby(df2.key1)[<span class="st">"data1"</span>].<span class="bu">sum</span>()   <span class="co"># `GroupBy` 클래스 객체에서 data1만 선택하여 분석하는 경우</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>key1
+A    8
+B    7
+Name: data1, dtype: int64</code></pre>
+</div>
+</div>
+<div id="cell-35" class="cell" data-school_cell_uuid="cba7a9ec38c746488abd779bfc2207f8" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df2.groupby(df2.key1).<span class="bu">sum</span>()[<span class="st">"data1"</span>]  <span class="co"># 전체 데이터를 분석한 후 data1만 선택한 경우</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>key1
+A    8
+B    7
+Name: data1, dtype: int64</code></pre>
+</div>
+</div>
+<p>````fmzogbgxczaq 연습 문제 4.7.1</p>
+<p>key1의 값을 기준으로 data1의 값을 분류하여 합계를 구한 결과를 시리즈가 아닌 데이터프레임으로 구한다.</p>
+<pre><code>
+이번에는 복합 키 (key1, key2) 값에 따른 data1의 합계를 구하자. 
+분석하고자 하는 키가 복수이면 리스트를 사용한다.
+
+::: {#cell-38 .cell school_cell_uuid='c360c8775f9040618f78e52811f52efc' execution_count=13}
+``` {.python .cell-code}
+df2.data1.groupby([df2.key1, df2.key2]).sum()
+```
+
+::: {.cell-output .cell-output-display execution_count=13}
+```
+key1  key2
+A     one     6
+      two     2
+B     one     3
+      two     4
+Name: data1, dtype: int64
+```
+:::
+:::
+
+
+이 결과를 `unstack` 명령으로 피봇 데이블 형태로 만들수도 있다.
+
+::: {#cell-40 .cell school_cell_uuid='eaf18468cc3b4d188d18d069a2e39618' execution_count=14}
+``` {.python .cell-code}
+df2.data1.groupby([df2["key1"], df2["key2"]]).sum().unstack("key2")
+```
+
+::: {.cell-output .cell-output-display execution_count=14}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;key2&lt;/th&gt;
+      &lt;th&gt;one&lt;/th&gt;
+      &lt;th&gt;two&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;key1&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;A&lt;/th&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;B&lt;/th&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+그룹분석 기능을 사용하면 위의 인구 데이터로부터 지역별 합계를 구할 수도 있다.
+
+::: {#cell-42 .cell school_cell_uuid='6fdfb59cac404fafba3d23d0bdbb4206' execution_count=15}
+``` {.python .cell-code}
+df1["인구"].groupby([df1["지역"], df1["연도"]]).sum().unstack("연도")
+```
+
+::: {.cell-output .cell-output-display execution_count=15}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;연도&lt;/th&gt;
+      &lt;th&gt;2005&lt;/th&gt;
+      &lt;th&gt;2010&lt;/th&gt;
+      &lt;th&gt;2015&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;지역&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;경상권&lt;/th&gt;
+      &lt;td&gt;3512547&lt;/td&gt;
+      &lt;td&gt;3393191&lt;/td&gt;
+      &lt;td&gt;3448737&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;수도권&lt;/th&gt;
+      &lt;td&gt;9762546&lt;/td&gt;
+      &lt;td&gt;9894685&lt;/td&gt;
+      &lt;td&gt;12794763&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+다음 데이터는 150 송이의 붓꽃(iris)에 대해 붓꽃 종(species)별로 꽃잎길이(sepal_length), 꽃잎폭(sepal_width), 꽃잎폭(sepal_width), 꽃잎폭(sepal_width)을 측정한 데이터이다. 
+
+::: {#cell-44 .cell school_cell_uuid='c998ff1907d6438e911ea526efabcdac' execution_count=16}
+``` {.python .cell-code}
+import seaborn as sns
+iris = sns.load_dataset("iris")
+```
+:::
+
+
+각 붓꽃 종별로 가장 큰 값과 가장 작은 값의 비율을 구해보자. 이러한 계산을 하는 그룹연산 메서드는 없으므로 직접 만든 후 `agg` 메서드를 적용한다.
+
+::: {#cell-46 .cell school_cell_uuid='8b4000bc559947159cf21e78896d9e03' execution_count=17}
+``` {.python .cell-code}
+def peak_to_peak_ratio(x):
+    return x.max() / x.min()
+
+iris.groupby(iris.species).agg(peak_to_peak_ratio)
+```
+
+::: {.cell-output .cell-output-display execution_count=17}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;sepal_length&lt;/th&gt;
+      &lt;th&gt;sepal_width&lt;/th&gt;
+      &lt;th&gt;petal_length&lt;/th&gt;
+      &lt;th&gt;petal_width&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;species&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;setosa&lt;/th&gt;
+      &lt;td&gt;1.348837&lt;/td&gt;
+      &lt;td&gt;1.913043&lt;/td&gt;
+      &lt;td&gt;1.900000&lt;/td&gt;
+      &lt;td&gt;6.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;versicolor&lt;/th&gt;
+      &lt;td&gt;1.428571&lt;/td&gt;
+      &lt;td&gt;1.700000&lt;/td&gt;
+      &lt;td&gt;1.700000&lt;/td&gt;
+      &lt;td&gt;1.800000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;virginica&lt;/th&gt;
+      &lt;td&gt;1.612245&lt;/td&gt;
+      &lt;td&gt;1.727273&lt;/td&gt;
+      &lt;td&gt;1.533333&lt;/td&gt;
+      &lt;td&gt;1.785714&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+
+```{margin}
+`describe`
+```
+
+
+`describe` 메서드를 사용하면 다양한 기술 통계(descriptive statistics)값을 한 번에 구한다. 그룹별로 하나의 스칼라 값이 아니라 하나의 데이터프레임이 생성된다는 점에 주의하라.
+
+::: {#cell-49 .cell school_cell_uuid='2b5f4c36cbac43628e0e43f3140a6165' execution_count=18}
+``` {.python .cell-code}
+iris.groupby(iris.species).describe().T
+```
+
+::: {.cell-output .cell-output-display execution_count=18}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;species&lt;/th&gt;
+      &lt;th&gt;setosa&lt;/th&gt;
+      &lt;th&gt;versicolor&lt;/th&gt;
+      &lt;th&gt;virginica&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="8" valign="top"&gt;sepal_length&lt;/th&gt;
+      &lt;th&gt;count&lt;/th&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;mean&lt;/th&gt;
+      &lt;td&gt;5.006000&lt;/td&gt;
+      &lt;td&gt;5.936000&lt;/td&gt;
+      &lt;td&gt;6.588000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;std&lt;/th&gt;
+      &lt;td&gt;0.352490&lt;/td&gt;
+      &lt;td&gt;0.516171&lt;/td&gt;
+      &lt;td&gt;0.635880&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;min&lt;/th&gt;
+      &lt;td&gt;4.300000&lt;/td&gt;
+      &lt;td&gt;4.900000&lt;/td&gt;
+      &lt;td&gt;4.900000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;25%&lt;/th&gt;
+      &lt;td&gt;4.800000&lt;/td&gt;
+      &lt;td&gt;5.600000&lt;/td&gt;
+      &lt;td&gt;6.225000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;50%&lt;/th&gt;
+      &lt;td&gt;5.000000&lt;/td&gt;
+      &lt;td&gt;5.900000&lt;/td&gt;
+      &lt;td&gt;6.500000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;75%&lt;/th&gt;
+      &lt;td&gt;5.200000&lt;/td&gt;
+      &lt;td&gt;6.300000&lt;/td&gt;
+      &lt;td&gt;6.900000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;max&lt;/th&gt;
+      &lt;td&gt;5.800000&lt;/td&gt;
+      &lt;td&gt;7.000000&lt;/td&gt;
+      &lt;td&gt;7.900000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="8" valign="top"&gt;sepal_width&lt;/th&gt;
+      &lt;th&gt;count&lt;/th&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;mean&lt;/th&gt;
+      &lt;td&gt;3.428000&lt;/td&gt;
+      &lt;td&gt;2.770000&lt;/td&gt;
+      &lt;td&gt;2.974000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;std&lt;/th&gt;
+      &lt;td&gt;0.379064&lt;/td&gt;
+      &lt;td&gt;0.313798&lt;/td&gt;
+      &lt;td&gt;0.322497&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;min&lt;/th&gt;
+      &lt;td&gt;2.300000&lt;/td&gt;
+      &lt;td&gt;2.000000&lt;/td&gt;
+      &lt;td&gt;2.200000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;25%&lt;/th&gt;
+      &lt;td&gt;3.200000&lt;/td&gt;
+      &lt;td&gt;2.525000&lt;/td&gt;
+      &lt;td&gt;2.800000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;50%&lt;/th&gt;
+      &lt;td&gt;3.400000&lt;/td&gt;
+      &lt;td&gt;2.800000&lt;/td&gt;
+      &lt;td&gt;3.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;75%&lt;/th&gt;
+      &lt;td&gt;3.675000&lt;/td&gt;
+      &lt;td&gt;3.000000&lt;/td&gt;
+      &lt;td&gt;3.175000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;max&lt;/th&gt;
+      &lt;td&gt;4.400000&lt;/td&gt;
+      &lt;td&gt;3.400000&lt;/td&gt;
+      &lt;td&gt;3.800000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="8" valign="top"&gt;petal_length&lt;/th&gt;
+      &lt;th&gt;count&lt;/th&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;mean&lt;/th&gt;
+      &lt;td&gt;1.462000&lt;/td&gt;
+      &lt;td&gt;4.260000&lt;/td&gt;
+      &lt;td&gt;5.552000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;std&lt;/th&gt;
+      &lt;td&gt;0.173664&lt;/td&gt;
+      &lt;td&gt;0.469911&lt;/td&gt;
+      &lt;td&gt;0.551895&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;min&lt;/th&gt;
+      &lt;td&gt;1.000000&lt;/td&gt;
+      &lt;td&gt;3.000000&lt;/td&gt;
+      &lt;td&gt;4.500000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;25%&lt;/th&gt;
+      &lt;td&gt;1.400000&lt;/td&gt;
+      &lt;td&gt;4.000000&lt;/td&gt;
+      &lt;td&gt;5.100000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;50%&lt;/th&gt;
+      &lt;td&gt;1.500000&lt;/td&gt;
+      &lt;td&gt;4.350000&lt;/td&gt;
+      &lt;td&gt;5.550000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;75%&lt;/th&gt;
+      &lt;td&gt;1.575000&lt;/td&gt;
+      &lt;td&gt;4.600000&lt;/td&gt;
+      &lt;td&gt;5.875000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;max&lt;/th&gt;
+      &lt;td&gt;1.900000&lt;/td&gt;
+      &lt;td&gt;5.100000&lt;/td&gt;
+      &lt;td&gt;6.900000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="8" valign="top"&gt;petal_width&lt;/th&gt;
+      &lt;th&gt;count&lt;/th&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+      &lt;td&gt;50.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;mean&lt;/th&gt;
+      &lt;td&gt;0.246000&lt;/td&gt;
+      &lt;td&gt;1.326000&lt;/td&gt;
+      &lt;td&gt;2.026000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;std&lt;/th&gt;
+      &lt;td&gt;0.105386&lt;/td&gt;
+      &lt;td&gt;0.197753&lt;/td&gt;
+      &lt;td&gt;0.274650&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;min&lt;/th&gt;
+      &lt;td&gt;0.100000&lt;/td&gt;
+      &lt;td&gt;1.000000&lt;/td&gt;
+      &lt;td&gt;1.400000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;25%&lt;/th&gt;
+      &lt;td&gt;0.200000&lt;/td&gt;
+      &lt;td&gt;1.200000&lt;/td&gt;
+      &lt;td&gt;1.800000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;50%&lt;/th&gt;
+      &lt;td&gt;0.200000&lt;/td&gt;
+      &lt;td&gt;1.300000&lt;/td&gt;
+      &lt;td&gt;2.000000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;75%&lt;/th&gt;
+      &lt;td&gt;0.300000&lt;/td&gt;
+      &lt;td&gt;1.500000&lt;/td&gt;
+      &lt;td&gt;2.300000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;max&lt;/th&gt;
+      &lt;td&gt;0.600000&lt;/td&gt;
+      &lt;td&gt;1.800000&lt;/td&gt;
+      &lt;td&gt;2.500000&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+
+```{margin}
+`apply`
+```
+
+
+`apply` 메서드를 사용하면 `describe` 메서드처럼 하나의 그룹에 대해 하나의 대표값(스칼라 값)을 구하는 게 아니라 데이터프레임을 만들 수 있다. 예를 들어 다음처럼 각 붓꽃 종별로 가장 꽃잎 길이(petal length)가 큰 3개의 데이터를 뽑아낼 수도 있다.
+
+::: {#cell-52 .cell school_cell_uuid='0643604b8876431eb5f7b1d85f722fc3' execution_count=19}
+``` {.python .cell-code}
+def top3_petal_length(df):
+    return df.sort_values(by="petal_length", ascending=False)[:3]
+
+iris.groupby(iris.species).apply(top3_petal_length)
+```
+
+::: {.cell-output .cell-output-display execution_count=19}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;sepal_length&lt;/th&gt;
+      &lt;th&gt;sepal_width&lt;/th&gt;
+      &lt;th&gt;petal_length&lt;/th&gt;
+      &lt;th&gt;petal_width&lt;/th&gt;
+      &lt;th&gt;species&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;species&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="3" valign="top"&gt;setosa&lt;/th&gt;
+      &lt;th&gt;24&lt;/th&gt;
+      &lt;td&gt;4.8&lt;/td&gt;
+      &lt;td&gt;3.4&lt;/td&gt;
+      &lt;td&gt;1.9&lt;/td&gt;
+      &lt;td&gt;0.2&lt;/td&gt;
+      &lt;td&gt;setosa&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;44&lt;/th&gt;
+      &lt;td&gt;5.1&lt;/td&gt;
+      &lt;td&gt;3.8&lt;/td&gt;
+      &lt;td&gt;1.9&lt;/td&gt;
+      &lt;td&gt;0.4&lt;/td&gt;
+      &lt;td&gt;setosa&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;23&lt;/th&gt;
+      &lt;td&gt;5.1&lt;/td&gt;
+      &lt;td&gt;3.3&lt;/td&gt;
+      &lt;td&gt;1.7&lt;/td&gt;
+      &lt;td&gt;0.5&lt;/td&gt;
+      &lt;td&gt;setosa&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="3" valign="top"&gt;versicolor&lt;/th&gt;
+      &lt;th&gt;83&lt;/th&gt;
+      &lt;td&gt;6.0&lt;/td&gt;
+      &lt;td&gt;2.7&lt;/td&gt;
+      &lt;td&gt;5.1&lt;/td&gt;
+      &lt;td&gt;1.6&lt;/td&gt;
+      &lt;td&gt;versicolor&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;77&lt;/th&gt;
+      &lt;td&gt;6.7&lt;/td&gt;
+      &lt;td&gt;3.0&lt;/td&gt;
+      &lt;td&gt;5.0&lt;/td&gt;
+      &lt;td&gt;1.7&lt;/td&gt;
+      &lt;td&gt;versicolor&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;72&lt;/th&gt;
+      &lt;td&gt;6.3&lt;/td&gt;
+      &lt;td&gt;2.5&lt;/td&gt;
+      &lt;td&gt;4.9&lt;/td&gt;
+      &lt;td&gt;1.5&lt;/td&gt;
+      &lt;td&gt;versicolor&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="3" valign="top"&gt;virginica&lt;/th&gt;
+      &lt;th&gt;118&lt;/th&gt;
+      &lt;td&gt;7.7&lt;/td&gt;
+      &lt;td&gt;2.6&lt;/td&gt;
+      &lt;td&gt;6.9&lt;/td&gt;
+      &lt;td&gt;2.3&lt;/td&gt;
+      &lt;td&gt;virginica&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;117&lt;/th&gt;
+      &lt;td&gt;7.7&lt;/td&gt;
+      &lt;td&gt;3.8&lt;/td&gt;
+      &lt;td&gt;6.7&lt;/td&gt;
+      &lt;td&gt;2.2&lt;/td&gt;
+      &lt;td&gt;virginica&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;122&lt;/th&gt;
+      &lt;td&gt;7.7&lt;/td&gt;
+      &lt;td&gt;2.8&lt;/td&gt;
+      &lt;td&gt;6.7&lt;/td&gt;
+      &lt;td&gt;2.0&lt;/td&gt;
+      &lt;td&gt;virginica&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+
+```{margin}
+`transform`
+```
+
+
+`transform` 메서드는 그룹별 대표값을 만드는 것이 아니라 그룹별 계산을 통해 데이터프레임 자체를 변화시킨다. 따라서 만들어진 데이터프레임의 크기는 원래 데이터프레임과 같다. 예를 들어 다음처럼 각 붓꽃 꽃잎길이가 해당 종 내에서  대/중/소 어느 것에 해당되는지에 대한 데이터프레임을 만들 수도 있다.
+
+::: {#cell-55 .cell school_cell_uuid='de641b5d681545c5be5ce050eec6b6f1' execution_count=20}
+``` {.python .cell-code}
+def q3cut(s):
+    return pd.qcut(s, 3, labels=["소", "중", "대"]).astype(str)
+
+
+iris["petal_length_class"] = iris.groupby(iris.species).petal_length.transform(q3cut)
+iris[["petal_length", "petal_length_class"]].tail(10)
+```
+
+::: {.cell-output .cell-output-display execution_count=20}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;petal_length&lt;/th&gt;
+      &lt;th&gt;petal_length_class&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;140&lt;/th&gt;
+      &lt;td&gt;5.6&lt;/td&gt;
+      &lt;td&gt;중&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;141&lt;/th&gt;
+      &lt;td&gt;5.1&lt;/td&gt;
+      &lt;td&gt;소&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;142&lt;/th&gt;
+      &lt;td&gt;5.1&lt;/td&gt;
+      &lt;td&gt;소&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;143&lt;/th&gt;
+      &lt;td&gt;5.9&lt;/td&gt;
+      &lt;td&gt;대&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;144&lt;/th&gt;
+      &lt;td&gt;5.7&lt;/td&gt;
+      &lt;td&gt;중&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;145&lt;/th&gt;
+      &lt;td&gt;5.2&lt;/td&gt;
+      &lt;td&gt;소&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;146&lt;/th&gt;
+      &lt;td&gt;5.0&lt;/td&gt;
+      &lt;td&gt;소&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;147&lt;/th&gt;
+      &lt;td&gt;5.2&lt;/td&gt;
+      &lt;td&gt;소&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;148&lt;/th&gt;
+      &lt;td&gt;5.4&lt;/td&gt;
+      &lt;td&gt;중&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;149&lt;/th&gt;
+      &lt;td&gt;5.1&lt;/td&gt;
+      &lt;td&gt;소&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+````{admonition} 연습 문제 4.7.2
+
+붓꽃(iris) 데이터에서 붓꽃 종(species)별로 꽃잎길이(sepal_length), 꽃잎폭(sepal_width) 등의 평균을 구하라.
+만약 붓꽃 종(species)이 표시되지 않았을 때 이 수치들을 이용하여 붓꽃 종을 찾아낼 수 있을지 생각하라.</code></pre>
+</section>
+</section>
+<section id="pivot_table" class="level2">
+<h2 class="anchored" data-anchor-id="pivot_table"><code>pivot_table</code></h2>
+<pre class="{margin}"><code>`pivot_table`</code></pre>
+<p>Pandas는 <code>pivot</code> 명령과 <code>groupby</code> 명령의 중간 성격을 가지는 <code>pivot_table</code> 명령도 제공한다.</p>
+<p><code>pivot_table</code> 명령은 <code>groupby</code> 명령처럼 그룹분석을 하지만 최종적으로는 <code>pivot</code> 명령처럼 피봇테이블을 만든다. 즉 <code>groupby</code> 명령의 결과에 <code>unstack</code>을 자동 적용하여 2차원적인 형태로 변형한다. 사용 방법은 다음과 같다.</p>
+<ul>
+<li><code>pivot_table(data, values=None, index=None, columns=None, aggfunc='mean', fill_value=None, margins=False, margins_name='All')</code>
+<ul>
+<li><code>data</code>: 분석할 데이터프레임 (메서드일 때는 필요하지 않음)</li>
+<li><code>values</code>: 분석할 데이터프레임에서 분석할 열</li>
+<li><code>index</code>: 행 인덱스로 들어갈 키 열 또는 키 열의 리스트</li>
+<li><code>columns</code>: 열 인덱스로 들어갈 키 열 또는 키 열의 리스트</li>
+<li><code>aggfunc</code>: 분석 메서드</li>
+<li><code>fill_value</code>: NaN 대체 값</li>
+<li><code>margins</code>: 모든 데이터를 분석한 결과를 오른쪽과 아래에 붙일지 여부</li>
+<li><code>margins_name</code>: 마진 열(행)의 이름</li>
+</ul></li>
+</ul>
+<p>만약 조건에 따른 데이터가 유일하게 선택되지 않으면 그룹연산을 하며 이 때 <code>aggfunc</code> 인수로 정의된 함수를 수행하여 대표값을 계산한다.</p>
+<p><code>pivot_table</code>를 메서드로 사용할 때는 객체 자체가 데이터가 되므로 <code>data</code> 인수가 필요하지 않다.</p>
+<p>예를 들어 위에서 만들었던 피봇테이블은 <code>pivot_table</code> 명령으로 다음과 같이 만들 수도 있다. 인수의 순서에 주의하라.</p>
+<div id="cell-61" class="cell" data-school_cell_uuid="08b76b7daf4c4aabb0cbaa77a66f4e5f" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df1.pivot_table(<span class="st">"인구"</span>, <span class="st">"도시"</span>, <span class="st">"연도"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">2005</th>
+<th data-quarto-table-cell-role="th">2010</th>
+<th data-quarto-table-cell-role="th">2015</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3512547.0</td>
+<td>3393191.0</td>
+<td>3448737.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9762546.0</td>
+<td>9631482.0</td>
+<td>9904312.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>NaN</td>
+<td>263203.0</td>
+<td>2890451.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>margins=True</code> 인수를 주면 <code>aggfunc</code>로 주어진 분석 방법을 해당 열의 모든 데이터, 해당 행의 모든 데이터 그리고 전체 데이터에 대해 적용한 결과를 같이 보여준다. <code>aggfunc</code>가 주어지지 않았으면 평균을 계산한다.</p>
+<div id="cell-63" class="cell" data-school_cell_uuid="484dafe7764e48f8b993790c629b1eb9" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df1.pivot_table(<span class="st">"인구"</span>, <span class="st">"도시"</span>, <span class="st">"연도"</span>, margins<span class="op">=</span><span class="va">True</span>, margins_name<span class="op">=</span><span class="st">"합계"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">2005</th>
+<th data-quarto-table-cell-role="th">2010</th>
+<th data-quarto-table-cell-role="th">2015</th>
+<th data-quarto-table-cell-role="th">합계</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3512547.0</td>
+<td>3393191.0</td>
+<td>3448737.0</td>
+<td>3.451492e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9762546.0</td>
+<td>9631482.0</td>
+<td>9904312.0</td>
+<td>9.766113e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>NaN</td>
+<td>263203.0</td>
+<td>2890451.0</td>
+<td>1.576827e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">합계</td>
+<td>6637546.5</td>
+<td>4429292.0</td>
+<td>5414500.0</td>
+<td>5.350809e+06</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>이 결과에서 가장 오른쪽 합계 열의 첫번째 값 3451492은 모든 부산 인구 데이터의 평균, 두번째 값 9766113은 모든 서울 인구 데이터의 평균이다. 가장 아래의 합계 행의 첫번째 값은 2005년 데이터의 평균값, 두번째 값은 2010년 데이터의 평균값이다. 가장 오른쪽 아래의 값 5350809는 전체 데이터의 평균값이다. 다음 계산을 통해 이를 확인할 수 있다.</p>
+<div id="cell-65" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df1[<span class="st">"인구"</span>].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>5350808.625</code></pre>
+</div>
+</div>
+<p>행 인덱스나 열 인덱스에 리스트를 넣으면 다중 인덱스 테이블을 만든다.</p>
+<div id="cell-67" class="cell" data-school_cell_uuid="c172b1deec514208b34b4477b6c8c930" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df1.pivot_table(<span class="st">"인구"</span>, index<span class="op">=</span>[<span class="st">"연도"</span>, <span class="st">"도시"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">인구</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">연도</th>
+<th data-quarto-table-cell-role="th">도시</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td rowspan="2" data-quarto-table-cell-role="th" data-valign="top">2005</td>
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3512547</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9762546</td>
+</tr>
+<tr class="odd">
+<td rowspan="3" data-quarto-table-cell-role="th" data-valign="top">2010</td>
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3393191</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9631482</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>263203</td>
+</tr>
+<tr class="even">
+<td rowspan="3" data-quarto-table-cell-role="th" data-valign="top">2015</td>
+<td data-quarto-table-cell-role="th">부산</td>
+<td>3448737</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">서울</td>
+<td>9904312</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">인천</td>
+<td>2890451</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>식당에서 식사 후 내는 팁(tip)과 관련된 데이터를 이용하여 좀더 구체적으로 그룹분석 방법을 살펴본다. 우선 Seaborn 패키지에 설치된 샘플 데이터를 로드한다. 이 데이터프레임에서 각각의 컬럼은 다음을 뜻한다.</p>
+<ul>
+<li>total_bill: 식사대금</li>
+<li>tip: 팁</li>
+<li>sex: 성별</li>
+<li>smoker: 흡연/금연 여부</li>
+<li>day: 요일</li>
+<li>time: 시간</li>
+<li>size: 인원</li>
+</ul>
+<div id="cell-69" class="cell" data-school_cell_uuid="cc2f62fa6d454d99a75bb1e98d62ccb6" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>tips <span class="op">=</span> sns.load_dataset(<span class="st">"tips"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>tips.tail()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">total_bill</th>
+<th data-quarto-table-cell-role="th">tip</th>
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th">day</th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">239</td>
+<td>29.03</td>
+<td>5.92</td>
+<td>Male</td>
+<td>No</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">240</td>
+<td>27.18</td>
+<td>2.00</td>
+<td>Female</td>
+<td>Yes</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">241</td>
+<td>22.67</td>
+<td>2.00</td>
+<td>Male</td>
+<td>Yes</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">242</td>
+<td>17.82</td>
+<td>1.75</td>
+<td>Male</td>
+<td>No</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">243</td>
+<td>18.78</td>
+<td>3.00</td>
+<td>Female</td>
+<td>No</td>
+<td>Thur</td>
+<td>Dinner</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>분석의 목표는 식사 대금 대비 팁의 비율이 어떤 경우에 가장 높아지지는 찾는 것이다. 우선 식사대금와 팁의 비율을 나타내는 <code>tip_pct</code>를 추가하자.</p>
+<div id="cell-71" class="cell" data-school_cell_uuid="e1cb3432993742789b1fa635862559c8" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tips[<span class="st">'tip_pct'</span>] <span class="op">=</span> tips[<span class="st">'tip'</span>] <span class="op">/</span> tips[<span class="st">'total_bill'</span>]</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>tips.tail()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">total_bill</th>
+<th data-quarto-table-cell-role="th">tip</th>
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th">day</th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">size</th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">239</td>
+<td>29.03</td>
+<td>5.92</td>
+<td>Male</td>
+<td>No</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>3</td>
+<td>0.203927</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">240</td>
+<td>27.18</td>
+<td>2.00</td>
+<td>Female</td>
+<td>Yes</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>2</td>
+<td>0.073584</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">241</td>
+<td>22.67</td>
+<td>2.00</td>
+<td>Male</td>
+<td>Yes</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>2</td>
+<td>0.088222</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">242</td>
+<td>17.82</td>
+<td>1.75</td>
+<td>Male</td>
+<td>No</td>
+<td>Sat</td>
+<td>Dinner</td>
+<td>2</td>
+<td>0.098204</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">243</td>
+<td>18.78</td>
+<td>3.00</td>
+<td>Female</td>
+<td>No</td>
+<td>Thur</td>
+<td>Dinner</td>
+<td>2</td>
+<td>0.159744</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>다음으로 각 열의 데이터에 대해 간단히 분포를 알아본다.</p>
+<div id="cell-73" class="cell" data-school_cell_uuid="7b4c0a8e1f21419aa260626237335939" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tips.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">total_bill</th>
+<th data-quarto-table-cell-role="th">tip</th>
+<th data-quarto-table-cell-role="th">size</th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>244.000000</td>
+<td>244.000000</td>
+<td>244.000000</td>
+<td>244.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>19.785943</td>
+<td>2.998279</td>
+<td>2.569672</td>
+<td>0.160803</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>8.902412</td>
+<td>1.383638</td>
+<td>0.951100</td>
+<td>0.061072</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>3.070000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>0.035638</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>13.347500</td>
+<td>2.000000</td>
+<td>2.000000</td>
+<td>0.129127</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>17.795000</td>
+<td>2.900000</td>
+<td>2.000000</td>
+<td>0.154770</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>24.127500</td>
+<td>3.562500</td>
+<td>3.000000</td>
+<td>0.191475</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>50.810000</td>
+<td>10.000000</td>
+<td>6.000000</td>
+<td>0.710345</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>우선 성별로 나누어 데이터 갯수를 세어본다.</p>
+<div id="cell-75" class="cell" data-school_cell_uuid="473bbbfdbc654cd49cded74d53ec132f" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tips.groupby(<span class="st">"sex"</span>).count()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">total_bill</th>
+<th data-quarto-table-cell-role="th">tip</th>
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th">day</th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">size</th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Male</td>
+<td>157</td>
+<td>157</td>
+<td>157</td>
+<td>157</td>
+<td>157</td>
+<td>157</td>
+<td>157</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Female</td>
+<td>87</td>
+<td>87</td>
+<td>87</td>
+<td>87</td>
+<td>87</td>
+<td>87</td>
+<td>87</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>데이터 갯수의 경우 NaN 데이터가 없다면 모두 같은 값이 나올 것이다. 이 때는 <code>size</code> 명령을 사용하면 더 간단히 표시된다. <code>size</code> 명령은 NaN이 있어도 상관하지 않는다.</p>
+<div id="cell-77" class="cell" data-school_cell_uuid="00edc90849654f81acddfd414ffd614e" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tips.groupby(<span class="st">"sex"</span>).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>sex
+Male      157
+Female     87
+dtype: int64</code></pre>
+</div>
+</div>
+<p>이번에는 성별과 흡연유무로 나누어 데이터의 갯수를 알아본다.</p>
+<div id="cell-79" class="cell" data-school_cell_uuid="51bda88bc0ed402185cf290fdbd5dc47" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tips.groupby([<span class="st">"sex"</span>, <span class="st">"smoker"</span>]).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>sex     smoker
+Male    Yes       60
+        No        97
+Female  Yes       33
+        No        54
+dtype: int64</code></pre>
+</div>
+</div>
+<p>좀 더 보기 좋도록 피봇 데이블 형태로 바꿀 수도 있다.</p>
+<div id="cell-81" class="cell" data-school_cell_uuid="85e29281c1c34bb0a12e575dbf7412cc" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>tips.pivot_table(<span class="st">"tip_pct"</span>, <span class="st">"sex"</span>, <span class="st">"smoker"</span>, aggfunc<span class="op">=</span><span class="st">"count"</span>, margins<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th">Yes</th>
+<th data-quarto-table-cell-role="th">No</th>
+<th data-quarto-table-cell-role="th">All</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Male</td>
+<td>60</td>
+<td>97</td>
+<td>157</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Female</td>
+<td>33</td>
+<td>54</td>
+<td>87</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">All</td>
+<td>93</td>
+<td>151</td>
+<td>244</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>이제 성별과 흡연 여부에 따른 평균 팁 비율을 살펴본다.</p>
+<div id="cell-83" class="cell" data-school_cell_uuid="04336fd393c544bc91a397754b293b64" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>tips.groupby(<span class="st">"sex"</span>)[[<span class="st">"tip_pct"</span>]].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Male</td>
+<td>0.157651</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Female</td>
+<td>0.166491</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-84" class="cell" data-school_cell_uuid="2a280666382c40f5a87efe9c0520d2f7" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>tips.groupby(<span class="st">"smoker"</span>)[[<span class="st">"tip_pct"</span>]].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Yes</td>
+<td>0.163196</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No</td>
+<td>0.159328</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>pivot_table</code> 명령을 사용할 수도 있다.</p>
+<div id="cell-86" class="cell" data-school_cell_uuid="0156dd9421664fb08bf8339845ff9271" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>tips.pivot_table(<span class="st">"tip_pct"</span>, <span class="st">"sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Male</td>
+<td>0.157651</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Female</td>
+<td>0.166491</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-87" class="cell" data-school_cell_uuid="0156dd9421664fb08bf8339845ff9271" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>tips.pivot_table(<span class="st">"tip_pct"</span>, [<span class="st">"sex"</span>, <span class="st">"smoker"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td rowspan="2" data-quarto-table-cell-role="th" data-valign="top">Male</td>
+<td data-quarto-table-cell-role="th">Yes</td>
+<td>0.152771</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No</td>
+<td>0.160669</td>
+</tr>
+<tr class="odd">
+<td rowspan="2" data-quarto-table-cell-role="th" data-valign="top">Female</td>
+<td data-quarto-table-cell-role="th">Yes</td>
+<td>0.182150</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No</td>
+<td>0.156921</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-88" class="cell" data-school_cell_uuid="51bda88bc0ed402185cf290fdbd5dc47" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>tips.pivot_table(<span class="st">"tip_pct"</span>, <span class="st">"sex"</span>, <span class="st">"smoker"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th">Yes</th>
+<th data-quarto-table-cell-role="th">No</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Male</td>
+<td>0.152771</td>
+<td>0.160669</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Female</td>
+<td>0.182150</td>
+<td>0.156921</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>여성 혹은 흡연자의 팁 비율이 높은 것을 볼 수 있다. 하지만 이 데이터에는 평균을 제외한 분산(variance) 등의 다른 통계값이 없으므로 <code>describe</code> 명령으로 여러가지 통계값을 한 번에 알아본다.</p>
+<div id="cell-90" class="cell" data-school_cell_uuid="ad7c25500b804bc89c3621ff84a1358c" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>tips.groupby(<span class="st">"sex"</span>)[[<span class="st">"tip_pct"</span>]].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th colspan="8" data-quarto-table-cell-role="th" data-halign="left">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+<tr class="header">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Male</td>
+<td>157.0</td>
+<td>0.157651</td>
+<td>0.064778</td>
+<td>0.035638</td>
+<td>0.121389</td>
+<td>0.153492</td>
+<td>0.186240</td>
+<td>0.710345</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Female</td>
+<td>87.0</td>
+<td>0.166491</td>
+<td>0.053632</td>
+<td>0.056433</td>
+<td>0.140416</td>
+<td>0.155581</td>
+<td>0.194266</td>
+<td>0.416667</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-91" class="cell" data-school_cell_uuid="ad7c25500b804bc89c3621ff84a1358c" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>tips.groupby(<span class="st">"smoker"</span>)[[<span class="st">"tip_pct"</span>]].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="38">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th colspan="8" data-quarto-table-cell-role="th" data-halign="left">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+<tr class="header">
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Yes</td>
+<td>93.0</td>
+<td>0.163196</td>
+<td>0.085119</td>
+<td>0.035638</td>
+<td>0.106771</td>
+<td>0.153846</td>
+<td>0.195059</td>
+<td>0.710345</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No</td>
+<td>151.0</td>
+<td>0.159328</td>
+<td>0.039910</td>
+<td>0.056797</td>
+<td>0.136906</td>
+<td>0.155625</td>
+<td>0.185014</td>
+<td>0.291990</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-92" class="cell" data-school_cell_uuid="ad7c25500b804bc89c3621ff84a1358c" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>tips.groupby([<span class="st">"sex"</span>, <span class="st">"smoker"</span>])[[<span class="st">"tip_pct"</span>]].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th colspan="8" data-quarto-table-cell-role="th" data-halign="left">tip_pct</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+<tr class="header">
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th">smoker</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td rowspan="2" data-quarto-table-cell-role="th" data-valign="top">Male</td>
+<td data-quarto-table-cell-role="th">Yes</td>
+<td>60.0</td>
+<td>0.152771</td>
+<td>0.090588</td>
+<td>0.035638</td>
+<td>0.101845</td>
+<td>0.141015</td>
+<td>0.191697</td>
+<td>0.710345</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No</td>
+<td>97.0</td>
+<td>0.160669</td>
+<td>0.041849</td>
+<td>0.071804</td>
+<td>0.131810</td>
+<td>0.157604</td>
+<td>0.186220</td>
+<td>0.291990</td>
+</tr>
+<tr class="odd">
+<td rowspan="2" data-quarto-table-cell-role="th" data-valign="top">Female</td>
+<td data-quarto-table-cell-role="th">Yes</td>
+<td>33.0</td>
+<td>0.182150</td>
+<td>0.071595</td>
+<td>0.056433</td>
+<td>0.152439</td>
+<td>0.173913</td>
+<td>0.198216</td>
+<td>0.416667</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No</td>
+<td>54.0</td>
+<td>0.156921</td>
+<td>0.036421</td>
+<td>0.056797</td>
+<td>0.139708</td>
+<td>0.149691</td>
+<td>0.181630</td>
+<td>0.252672</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>```fmzogbgxczaq 연습 문제 4.7.3</p>
+<ol type="1">
+<li>팁의 비율이 요일과 점심/저녁 여부, 인원수에 어떤 영향을 받는지 살펴본다.</li>
+<li>어떤 요인이 가장 크게 작용하는지 판단할 수 있는 방법이 있는가?</li>
+</ol>
+<pre><code>
+이번에는 각 그룹에서 가장 많은 팁과 가장 적은 팁의 차이를 알아보자. 이 계산을 해 줄 수 있는 그룹연산 함수가 없으므로 함수를 직접 만들고 `agg` 메서드를 사용한다.
+
+::: {#cell-95 .cell school_cell_uuid='cf52875b459640fda0a098a3de31174d' execution_count=40}
+``` {.python .cell-code}
+def peak_to_peak(x):
+    return x.max() - x.min()
+
+
+tips.groupby(["sex", "smoker"])[["tip"]].agg(peak_to_peak)
+```
+
+::: {.cell-output .cell-output-display execution_count=40}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;tip&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;sex&lt;/th&gt;
+      &lt;th&gt;smoker&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Male&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;9.00&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;7.75&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Female&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;5.50&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;4.20&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+만약 여러가지 그룹연산을 동시에 하고 싶다면 다음과 같이 리스트를 이용한다.
+
+::: {#cell-97 .cell school_cell_uuid='72767b4e40c7435b9b59e02b128cf3ad' execution_count=41}
+``` {.python .cell-code}
+tips.groupby(["sex", "smoker"]).agg(["mean", peak_to_peak])[["total_bill"]]
+```
+
+::: {.cell-output .cell-output-display execution_count=41}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th colspan="2" halign="left"&gt;total_bill&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;mean&lt;/th&gt;
+      &lt;th&gt;peak_to_peak&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;sex&lt;/th&gt;
+      &lt;th&gt;smoker&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Male&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;22.284500&lt;/td&gt;
+      &lt;td&gt;43.56&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;19.791237&lt;/td&gt;
+      &lt;td&gt;40.82&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Female&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;17.977879&lt;/td&gt;
+      &lt;td&gt;41.23&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;18.105185&lt;/td&gt;
+      &lt;td&gt;28.58&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+만약 데이터 열마다 다른 연산을 하고 싶다면 열 라벨과 연산 이름(또는 함수)를 딕셔너리로 넣는다.
+
+::: {#cell-99 .cell school_cell_uuid='d5fc79aac62c492cb97ded5e24cdee67' execution_count=42}
+``` {.python .cell-code}
+tips.groupby(["sex", "smoker"]).agg(
+    {'tip_pct': 'mean', 'total_bill': peak_to_peak})
+```
+
+::: {.cell-output .cell-output-display execution_count=42}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;tip_pct&lt;/th&gt;
+      &lt;th&gt;total_bill&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;sex&lt;/th&gt;
+      &lt;th&gt;smoker&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Male&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;0.152771&lt;/td&gt;
+      &lt;td&gt;43.56&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;0.160669&lt;/td&gt;
+      &lt;td&gt;40.82&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Female&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;0.182150&lt;/td&gt;
+      &lt;td&gt;41.23&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;0.156921&lt;/td&gt;
+      &lt;td&gt;28.58&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+다음은 `pivot_table` 명령으로 더 복잡한 분석을 한 예이다.
+
+::: {#cell-101 .cell school_cell_uuid='1a47c3400cfb4fa5a21510a9da3cdddb' execution_count=43}
+``` {.python .cell-code}
+tips.pivot_table(['tip_pct', 'size'], ['sex', 'day'], 'smoker')
+```
+
+::: {.cell-output .cell-output-display execution_count=43}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th colspan="2" halign="left"&gt;size&lt;/th&gt;
+      &lt;th colspan="2" halign="left"&gt;tip_pct&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;smoker&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;th&gt;No&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;sex&lt;/th&gt;
+      &lt;th&gt;day&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="4" valign="top"&gt;Male&lt;/th&gt;
+      &lt;th&gt;Thur&lt;/th&gt;
+      &lt;td&gt;2.300000&lt;/td&gt;
+      &lt;td&gt;2.500000&lt;/td&gt;
+      &lt;td&gt;0.164417&lt;/td&gt;
+      &lt;td&gt;0.165706&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Fri&lt;/th&gt;
+      &lt;td&gt;2.125000&lt;/td&gt;
+      &lt;td&gt;2.000000&lt;/td&gt;
+      &lt;td&gt;0.144730&lt;/td&gt;
+      &lt;td&gt;0.138005&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Sat&lt;/th&gt;
+      &lt;td&gt;2.629630&lt;/td&gt;
+      &lt;td&gt;2.656250&lt;/td&gt;
+      &lt;td&gt;0.139067&lt;/td&gt;
+      &lt;td&gt;0.162132&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Sun&lt;/th&gt;
+      &lt;td&gt;2.600000&lt;/td&gt;
+      &lt;td&gt;2.883721&lt;/td&gt;
+      &lt;td&gt;0.173964&lt;/td&gt;
+      &lt;td&gt;0.158291&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="4" valign="top"&gt;Female&lt;/th&gt;
+      &lt;th&gt;Thur&lt;/th&gt;
+      &lt;td&gt;2.428571&lt;/td&gt;
+      &lt;td&gt;2.480000&lt;/td&gt;
+      &lt;td&gt;0.163073&lt;/td&gt;
+      &lt;td&gt;0.155971&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Fri&lt;/th&gt;
+      &lt;td&gt;2.000000&lt;/td&gt;
+      &lt;td&gt;2.500000&lt;/td&gt;
+      &lt;td&gt;0.209129&lt;/td&gt;
+      &lt;td&gt;0.165296&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Sat&lt;/th&gt;
+      &lt;td&gt;2.200000&lt;/td&gt;
+      &lt;td&gt;2.307692&lt;/td&gt;
+      &lt;td&gt;0.163817&lt;/td&gt;
+      &lt;td&gt;0.147993&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Sun&lt;/th&gt;
+      &lt;td&gt;2.500000&lt;/td&gt;
+      &lt;td&gt;3.071429&lt;/td&gt;
+      &lt;td&gt;0.237075&lt;/td&gt;
+      &lt;td&gt;0.165710&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+::: {#cell-102 .cell school_cell_uuid='6c586414bdf04cee8ff35255776fc778' execution_count=44}
+``` {.python .cell-code}
+tips.pivot_table('size', ['time', 'sex', 'smoker'], 'day',
+                 aggfunc='sum', fill_value=0)
+```
+
+::: {.cell-output .cell-output-display execution_count=44}
+
+```{=html}
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border="1" class="dataframe"&gt;
+  &lt;thead&gt;
+    &lt;tr style="text-align: right;"&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;day&lt;/th&gt;
+      &lt;th&gt;Thur&lt;/th&gt;
+      &lt;th&gt;Fri&lt;/th&gt;
+      &lt;th&gt;Sat&lt;/th&gt;
+      &lt;th&gt;Sun&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;time&lt;/th&gt;
+      &lt;th&gt;sex&lt;/th&gt;
+      &lt;th&gt;smoker&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="4" valign="top"&gt;Lunch&lt;/th&gt;
+      &lt;th rowspan="2" valign="top"&gt;Male&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;23&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;50&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Female&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;17&lt;/td&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="4" valign="top"&gt;Dinner&lt;/th&gt;
+      &lt;th rowspan="2" valign="top"&gt;Male&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;12&lt;/td&gt;
+      &lt;td&gt;71&lt;/td&gt;
+      &lt;td&gt;39&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;85&lt;/td&gt;
+      &lt;td&gt;124&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th rowspan="2" valign="top"&gt;Female&lt;/th&gt;
+      &lt;th&gt;Yes&lt;/th&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;8&lt;/td&gt;
+      &lt;td&gt;33&lt;/td&gt;
+      &lt;td&gt;10&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;No&lt;/th&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;30&lt;/td&gt;
+      &lt;td&gt;43&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+```
+
+:::
+:::
+
+
+````{admonition} 연습 문제 4.7.4
+
+타이타닉 승객 데이터를 이용하여 다음 분석을 실시하라. 데이터는 다음과 같이 받을 수 있다.
+
+```
+titanic = sns.load_dataset("titanic")
+```
+
+1. `qcut` 명령으로 세 개의 나이 그룹을 만든다.
+2. 성별, 선실, 나이 그룹에 의한 생존율을 데이터프레임으로 계산한다. 
+행에는 성별 및 나이 그룹에 대한 다중 인덱스를 사용하고 열에는 선실 인덱스를 사용한다.
+생존률은 해당 그룹의 생존 인원수를 전체 인원수로 나눈 값이다.
+3. 성별 및 선실에 의한 생존율을 피봇 데이터 형태로 만든다.</code></pre>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
